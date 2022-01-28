@@ -1,4 +1,7 @@
 import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.26/vue.esm-browser.min.js";
+let productModal = null;
+let delProductModal = null;
+
 const product = {
   data: {
     title: "[賣]動物園造型衣服3",
@@ -52,6 +55,9 @@ createApp({
           alert(err.response.data.message);
         });
     },
+    getDataInfo(product) {
+      this.tempProduct = product;
+    },
     getData() {
       const url = `${this.apiUrl}/api/${this.apiPath}/admin/products`;
       axios
@@ -64,28 +70,56 @@ createApp({
           alert(err.response.data.message);
         });
     },
-    getDataInfo(item) {
-      this.tempProduct = item;
-    },
-    addData() {
-      axios
-        .post(`${this.apiUrl}/api/${this.apiPath}/admin/product`, product)
+    updateData() {
+      let url = `${this.apiUrl}/api/${this.apiPath}/admin/product`;
+      let http = "post";
+
+      if (!this.newItem) {
+        url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+        http = "put";
+      }
+
+      axios[http](url, { data: this.tempProduct })
         .then((res) => {
-          console.log(res.data);
+          alert(res.data.message);
+          productModal.hide();
           this.getData();
+          this.tempProduct = {};
         })
         .catch((error) => {
+          alert(error.response.data.message);
           console.dir(error);
         });
     },
-    deleteData(item) {
+    // 點擊不同按鈕改變newItem狀態
+    openModal(newItem, item) {
+      if (newItem === "new") {
+        this.tempProduct = {
+          imagesURL: [],
+        };
+        this.newItem = true;
+        productModal.show();
+      } else if (newItem === "edit") {
+        this.tempProduct = { ...item };
+        this.newItem = false;
+        productModal.show();
+      } else if (newItem === "delete") {
+        this.tempProduct = { ...item };
+        delProductModal.show();
+      }
+    },
+    deleteData() {
+      const url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
       axios
-        .delete(`${this.apiUrl}/api/${this.apiPath}/admin/product/${item.id}`)
+        .delete(url)
         .then((res) => {
-          console.log(res.data);
+          alert(res.message);
+          console.log(res);
+          delProductModal.hide();
           this.getData();
         })
         .catch((error) => {
+          alert(error.message);
           console.dir(error);
         });
     },
@@ -97,17 +131,38 @@ createApp({
         .then((res) => {
           alert("success");
           console.log(res.data);
-          this.getUpload();
+          this.tempProduct.imageURL = res.data.imageUrl;
         })
         .catch((error) => {
           console.dir(error);
         });
     },
-    getUpload() {
-      const image = formData.getAll("file-to-upload");
-      this.image = image.map((item) => {
-        return item.name;
+    uploadMultiImage(event) {
+      const image = event.target.files;
+      for (let i = 0; i < image.length; i++) {
+        let file = image[i];
+        formData.append("image-to-upload", file);
+      }
+      formData.forEach((item) => {
+        axios
+          .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, item)
+          .then((res) => {
+            alert("success");
+            console.log(res);
+          })
+          .catch((error) => {
+            console.dir(error);
+          });
       });
+    },
+    delImage(event) {
+      formData.delete("file-to-upload");
+      this.tempProduct.imageURL = "";
+      event.path[0].parentElement.children[1].value = "";
+    },
+    createImages() {
+      this.tempProduct.imagesURL = [];
+      this.tempProduct.imagesURL.push("");
     },
   },
   mounted() {

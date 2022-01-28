@@ -1,7 +1,7 @@
 {
   "name": "week2-api-mission",
   "version": "1.0.0",
-  "description": "",
+  "description": "* 登入登出 * 驗證登入身分 * 新增資料 * 刪除資料 * 上傳圖片",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,5 +12,14 @@
   "devDependencies": {
     "prettier": "^2.5.1",
     "prettier-eslint": "^13.0.0"
-  }
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuanliif/vue--week3.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yuanliif/vue--week3/issues"
+  },
+  "homepage": "https://github.com/yuanliif/vue--week3#readme"
 }
