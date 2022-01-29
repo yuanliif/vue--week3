@@ -135,29 +135,13 @@
                     <button
                       v-if="!(!this.tempProduct.imageURL)"
                       type="button"
-                      class="btn btn-danger d-block w-100"
+                      class="btn btn-outline-danger"
                       @click="delImage($event)"
                     >
                       刪除
                     </button>
                   </div>
                   <!-- 多張圖片 -->
-                  <!-- 增加後 -->
-                  <div
-                    class="mb-3"
-                    v-for="(item, index) in tempProduct.imagesURL"
-                  >
-                    <div class="panel" v-if="tempProduct.imagesURL.length">
-                      <img :src="item" class="img-thumbnail" :alt="index" />
-                      <button
-                        class="btn btn-outline-danger"
-                        type="button"
-                        id="button-delete"
-                      >
-                        刪除
-                      </button>
-                    </div>
-                  </div>
                   <!-- 增加前 -->
                   <div class="mb-3">
                     <label for="imagesURL" class="form-label h5"
@@ -168,9 +152,26 @@
                       type="file"
                       class="form-control mb-2"
                       placeholder="請輸入圖片連結"
-                      @change="uploadMultiImage($event)"
-                      multiple = "multiple"
+                      @change="uploadImage($event)"
                     />
+                  </div>
+                  <!-- 增加後 -->
+                  <div
+                    class="mb-3"
+                    v-for="(item, index) in tempProduct.imagesURL"
+                    :key="index"
+                  >
+                    <div class="panel" v-if="tempProduct.imagesURL.length">
+                      <img :src="item" class="img-thumbnail" :alt="index" />
+                      <button
+                        class="btn btn-outline-danger"
+                        type="button"
+                        id="button-delete"
+                        @click="delMultiImage(index)"
+                      >
+                        刪除
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <!-- 文字 -->

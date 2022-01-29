@@ -94,56 +94,50 @@ createApp({
       axios
         .delete(url)
         .then((res) => {
-          alert(res.message);
+          alert(res.data.message);
           console.log(res);
           delProductModal.hide();
           this.getData();
         })
         .catch((error) => {
-          alert(error.message);
+          alert(error.data.message);
           console.dir(error);
         });
     },
     uploadImage(event) {
-      const file = event.target.files[0];
-      formData.append("file-to-upload", file);
-      axios
-        .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, formData)
-        .then((res) => {
-          alert("success");
-          console.log(res.data);
-          this.tempProduct.imageURL = res.data.imageUrl;
-        })
-        .catch((error) => {
-          console.dir(error);
-        });
-    },
-    uploadMultiImage(event) {
-      for (let i = 0; i < event.target.files.length; i++) {
-        let image = event.target.files[i];
-        formData.append(`image-to-upload_${i}`, image);
-        console.log(...formData);
+      const formData = new FormData();
+      let idName = event.target.id;
+      const image = event.target.files[0];
+      formData.append("image-to-upload", image);
+      if (idName === "imageURL") {
+        axios
+          .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, formData)
+          .then((res) => {
+            alert("success");
+            this.tempProduct[idName] = res.data.imageUrl;
+          })
+          .catch((error) => {
+            console.dir(error);
+          });
+      } else {
+        axios
+          .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, formData)
+          .then((res) => {
+            alert("success");
+            this.tempProduct[idName].push(res.data.imageUrl);
+          })
+          .catch((error) => {
+            console.dir(error);
+          });
       }
-      axios
-        .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((res) => {
-          alert("success");
-          console.log(res);
-        })
-        .catch((error) => {
-          console.dir(error);
-        });
+      event.target.value = "";
     },
     delImage(event) {
-      formData.delete("file-to-upload");
       this.tempProduct.imageURL = "";
       event.path[0].parentElement.children[1].value = "";
     },
-    createImages() {
-      this.tempProduct.imagesURL = [];
-      this.tempProduct.imagesURL.push("");
+    delMultiImage(index) {
+      this.tempProduct.imagesURL.splice(index, 1);
     },
   },
   mounted() {
