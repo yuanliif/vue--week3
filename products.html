@@ -148,11 +148,7 @@
                     v-for="(item, index) in tempProduct.imagesURL"
                   >
                     <div class="panel" v-if="tempProduct.imagesURL.length">
-                      <img
-                        :src="item"
-                        class="img-thumbnail"
-                        alt="index"
-                      />
+                      <img :src="item" class="img-thumbnail" :alt="index" />
                       <button
                         class="btn btn-outline-danger"
                         type="button"
@@ -173,6 +169,7 @@
                       class="form-control mb-2"
                       placeholder="請輸入圖片連結"
                       @change="uploadMultiImage($event)"
+                      multiple = "multiple"
                     />
                   </div>
                 </div>

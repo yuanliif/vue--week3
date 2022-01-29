@@ -1,21 +1,6 @@
 import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.26/vue.esm-browser.min.js";
 let productModal = null;
 let delProductModal = null;
-
-const product = {
-  data: {
-    title: "[賣]動物園造型衣服3",
-    category: "衣服2",
-    origin_price: 100,
-    price: 300,
-    unit: "個",
-    description: "Sit down please 名設計師設計",
-    content: "這是內容",
-    is_enabled: 1,
-    imageUrl:
-      "https://images.unsplash.com/photo-1573662012516-5cb4399006e7?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80",
-  },
-};
 const formData = new FormData(); //用來產生表單格式
 
 createApp({
@@ -39,7 +24,7 @@ createApp({
           this.getData();
         })
         .catch((err) => {
-          alert(err.response.data.message);
+          alert(err);
           window.location = "index.html";
         });
     },
@@ -55,15 +40,11 @@ createApp({
           alert(err.response.data.message);
         });
     },
-    getDataInfo(product) {
-      this.tempProduct = product;
-    },
     getData() {
       const url = `${this.apiUrl}/api/${this.apiPath}/admin/products`;
       axios
         .get(url)
         .then((response) => {
-          console.log(response);
           this.products = response.data.products;
         })
         .catch((err) => {
@@ -138,22 +119,22 @@ createApp({
         });
     },
     uploadMultiImage(event) {
-      const image = event.target.files;
-      for (let i = 0; i < image.length; i++) {
-        let file = image[i];
-        formData.append("image-to-upload", file);
+      for (let i = 0; i < event.target.files.length; i++) {
+        let image = event.target.files[i];
+        formData.append(`image-to-upload_${i}`, image);
+        console.log(...formData);
       }
-      formData.forEach((item) => {
-        axios
-          .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, item)
-          .then((res) => {
-            alert("success");
-            console.log(res);
-          })
-          .catch((error) => {
-            console.dir(error);
-          });
-      });
+      axios
+        .post(`${this.apiUrl}/api/${this.apiPath}/admin/upload`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          alert("success");
+          console.log(res);
+        })
+        .catch((error) => {
+          console.dir(error);
+        });
     },
     delImage(event) {
       formData.delete("file-to-upload");
