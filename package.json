@@ -1,5 +1,5 @@
 {
-  "name": "week2-api-mission",
+  "name": "week4",
   "version": "1.0.0",
   "description": "* 登入登出 * 驗證登入身分 * 新增資料 * 刪除資料 * 上傳圖片",
   "main": "app.js",
@@ -10,16 +10,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^8.8.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
     "prettier": "^2.5.1",
     "prettier-eslint": "^13.0.0"
   },
-  "dependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yuanliif/vue--week3.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yuanliif/vue--week3/issues"
-  },
-  "homepage": "https://github.com/yuanliif/vue--week3#readme"
+  "dependencies": {}
 }

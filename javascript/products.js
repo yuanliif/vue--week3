@@ -1,15 +1,19 @@
 import { createApp } from "https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.26/vue.esm-browser.min.js";
+import pagination from "./pagination.js";
 let productModal = null;
 let delProductModal = null;
-const formData = new FormData(); //用來產生表單格式
 
-createApp({
+const app = createApp({
+  components: {
+    pagination,
+  },
   data() {
     return {
       apiUrl: "https://vue3-course-api.hexschool.io/v2",
       apiPath: "pastelsy",
       products: [],
       newItem: false,
+      pagination: {},
       tempProduct: {
         imagesURL: [],
       },
@@ -40,38 +44,19 @@ createApp({
           alert(err.response.data.message);
         });
     },
-    getData() {
-      const url = `${this.apiUrl}/api/${this.apiPath}/admin/products`;
+    getData(page = 1) {
+      const url = `${this.apiUrl}/api/${this.apiPath}/admin/products/?page=${page}`;
       axios
         .get(url)
         .then((response) => {
           this.products = response.data.products;
+          this.pagination = response.data.pagination;
         })
         .catch((err) => {
           alert(err.response.data.message);
         });
     },
-    updateData() {
-      let url = `${this.apiUrl}/api/${this.apiPath}/admin/product`;
-      let http = "post";
 
-      if (!this.newItem) {
-        url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
-        http = "put";
-      }
-
-      axios[http](url, { data: this.tempProduct })
-        .then((res) => {
-          alert(res.data.message);
-          productModal.hide();
-          this.getData();
-          this.tempProduct = {};
-        })
-        .catch((error) => {
-          alert(error.response.data.message);
-          console.dir(error);
-        });
-    },
     // 點擊不同按鈕改變newItem狀態
     openModal(newItem, item) {
       if (newItem === "new") {
@@ -81,28 +66,13 @@ createApp({
         this.newItem = true;
         productModal.show();
       } else if (newItem === "edit") {
-        this.tempProduct = { ...item };
+        this.tempProduct = JSON.parse(JSON.stringify(item));
         this.newItem = false;
         productModal.show();
       } else if (newItem === "delete") {
         this.tempProduct = { ...item };
         delProductModal.show();
       }
-    },
-    deleteData() {
-      const url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
-      axios
-        .delete(url)
-        .then((res) => {
-          alert(res.data.message);
-          console.log(res);
-          delProductModal.hide();
-          this.getData();
-        })
-        .catch((error) => {
-          alert(error.data.message);
-          console.dir(error);
-        });
     },
     uploadImage(event) {
       const formData = new FormData();
@@ -162,4 +132,56 @@ createApp({
 
     this.checkAdmin();
   },
-}).mount("#app");
+});
+
+app.component("productModal", {
+  props: ["tempProduct", "newItem", "apiPath", "apiUrl"],
+  template: "#templateforProductModal",
+  methods: {
+    updateData() {
+      let url = `${this.apiUrl}/api/${this.apiPath}/admin/product`;
+      let http = "post";
+
+      if (!this.newItem) {
+        url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+        http = "put";
+      }
+
+      axios[http](url, { data: this.tempProduct })
+        .then((res) => {
+          alert(res.data.message);
+          //* this.getData();  內層無法用到getData()，所以用emit傳出
+          this.$emit("get-data");
+          productModal.hide();
+        })
+        .catch((error) => {
+          alert(error);
+          console.dir(error);
+        });
+    },
+  },
+});
+
+app.component("delModal", {
+  props: ["tempProduct", "apiPath", "apiUrl"],
+  template: "#templateforDelModal",
+  methods: {
+    deleteData() {
+      const url = `${this.apiUrl}/api/${this.apiPath}/admin/product/${this.tempProduct.id}`;
+      axios
+        .delete(url)
+        .then((res) => {
+          alert(res.data.message);
+          //* this.getData();  內層無法用到getData()，所以用emit傳出
+          this.$emit("get-data");
+          delProductModal.hide();
+        })
+        .catch((error) => {
+          alert(error.data.message);
+          console.dir(error);
+        });
+    },
+  },
+});
+
+app.mount("#app");
